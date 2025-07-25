@@ -77,7 +77,7 @@
     apiKey: "AIzaSyCSMI6PBT0dubJcMmxJK64c695k-IFFI_s",
     authDomain: "crowding-survey.firebaseapp.com",
     projectId: "crowding-survey",
-    storageBucket: "crowding-survey.firebasestorage.app",
+    storageBucket: "crowding-survey.appspot.com", /* 修正: .app → .appspot.com */
     messagingSenderId: "535186702973",
     appId: "1:535186702973:web:93937ad1b1455b973e2714",
     measurementId: "G-YNYZ3N2ZKL"
@@ -86,15 +86,22 @@
   const db = firebase.firestore();
 
   /* --- 投票送信 --- */
-  form.addEventListener('submit', async e => {
+  const formElement = document.getElementById('form');
+  formElement.addEventListener('submit', async e => {
     e.preventDefault();
-    const lv = Number(new FormData(form).get('lv'));
-    await db.collection('votes').add({
-      lv,
-      ts: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    alert('ありがとうございました！');
-    form.reset();
+    const lv = Number(new FormData(formElement).get('lv'));
+    console.log("送信する値:", lv); // デバッグ用
+    try {
+      await db.collection('votes').add({
+        lv,
+        ts: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      alert('ありがとうございました！');
+      formElement.reset();
+    } catch (error) {
+      console.error('Firestoreへの送信エラー:', error);
+      alert('送信エラーが発生しました。');
+    }
   });
 
   /* --- リアルタイム集計 --- */
@@ -106,6 +113,7 @@
     .orderBy('ts','desc')
     .limit(200)
     .onSnapshot(ss => {
+      console.log("データ更新:", ss.size, "件"); // デバッグ用
       const tenMinAgo = Date.now() - 10*60*1000;
       const recent = ss.docs
         .map(d => d.data())
@@ -118,6 +126,8 @@
       const lv = Math.round(avg);
       indicator.textContent = LABEL[lv];
       indicator.className = CLASS[lv];
+    }, error => {
+      console.error("リアルタイム監視エラー:", error);
     });
 </script>
 </body>
