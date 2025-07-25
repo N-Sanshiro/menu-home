@@ -51,6 +51,12 @@
 </head>
 <body>
 
+<!-- 共通ヘッダー -->
+<div class="header-container">
+  <img src="public/manpuku.png" alt="Home" class="header-logo" onclick="location.href='index.html'">
+  <div class="header-title">混雑状況</div>
+</div>
+
 <div class="congest-container">
   <h1>今の混み具合は？</h1>
 
@@ -98,7 +104,7 @@
 
   db.collection('votes')
     .orderBy('ts','desc')
-    .limit(200)  // 過去200票を監視
+    .limit(200)
     .onSnapshot(ss => {
       const tenMinAgo = Date.now() - 10*60*1000;
       const recent = ss.docs
