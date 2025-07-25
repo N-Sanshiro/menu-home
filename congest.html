@@ -4,77 +4,115 @@
 <meta charset="utf-8" />
 <title>食堂混雑アンケート</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
+<!-- 共通CSS -->
+<link rel="stylesheet" href="public/style.css">
+<link rel="stylesheet" href="public/style_vender.css">
+
 <style>
-    body{font-family:sans-serif;text-align:center;padding:2rem}
-    #indicator{font-size:2rem;padding:1rem 2rem;border-radius:1rem;margin:1.5rem auto;width:max-content;color:#fff}
-    .lv0{background:#64dd17}.lv1{background:#ffeb3b;color:#000}.lv2{background:#d50000}
+  /* congest 固有のスタイル */
+  .congest-container {
+    text-align: center;
+    padding: 2rem;
+  }
+  #indicator {
+    font-size: 2rem;
+    padding: 1rem 2rem;
+    border-radius: 1rem;
+    margin: 1.5rem auto;
+    width: max-content;
+    color: #fff;
+  }
+  .lv0 { background: #64dd17; }  /* 空いてる */
+  .lv1 { background: #ffeb3b; color: #000; } /* 普通 */
+  .lv2 { background: #d50000; }  /* 混んでいる */
+  .congest-form label {
+    display: block;
+    margin: 0.5rem 0;
+  }
+  .congest-form button {
+    margin-top: 1rem;
+    padding: 0.5rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  .congest-form button:hover {
+    background-color: #0056b3;
+  }
 </style>
+
 <!-- Firebase v10 互換 CDN -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
-<h1>今の混み具合は？</h1>
+<div class="congest-container">
+  <h1>今の混み具合は？</h1>
 
-<form id="form">
-    <label><input type="radio" name="lv" value="0" required> 空いてる</label><br>
-    <label><input type="radio" name="lv" value="1"> 普通</label><br>
-    <label><input type="radio" name="lv" value="2"> 混んでいる</label><br><br>
-    <button>送信</button>
-</form>
+  <form id="form" class="congest-form">
+      <label><input type="radio" name="lv" value="0" required> 空いてる</label>
+      <label><input type="radio" name="lv" value="1"> 普通</label>
+      <label><input type="radio" name="lv" value="2"> 混んでいる</label>
+      <button type="submit">送信</button>
+  </form>
 
-<h2>リアルタイム表示</h2>
-<div id="indicator" class="lv0">投票待ち...</div>
+  <h2>リアルタイム表示</h2>
+  <div id="indicator" class="lv0">投票待ち...</div>
+</div>
 
 <script>
   /* --- Firebase 初期化 --- */
-    const firebaseConfig = {
-        apiKey: "AIzaSyCSMI6PBT0dubJcMmxJK64c695k-IFFI_s",
-        authDomain: "crowding-survey.firebaseapp.com",
-        projectId: "crowding-survey",
-        storageBucket: "crowding-survey.firebasestorage.app",
-        messagingSenderId: "535186702973",
-        appId: "1:535186702973:web:93937ad1b1455b973e2714",
-        measurementId: "G-YNYZ3N2ZKL"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+  const firebaseConfig = {
+    apiKey: "AIzaSyCSMI6PBT0dubJcMmxJK64c695k-IFFI_s",
+    authDomain: "crowding-survey.firebaseapp.com",
+    projectId: "crowding-survey",
+    storageBucket: "crowding-survey.firebasestorage.app",
+    messagingSenderId: "535186702973",
+    appId: "1:535186702973:web:93937ad1b1455b973e2714",
+    measurementId: "G-YNYZ3N2ZKL"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
   /* --- 投票送信 --- */
-    form.addEventListener('submit', async e => {
-        e.preventDefault();
-        const lv = Number(new FormData(form).get('lv'));
-        await db.collection('votes').add({
-            lv,
-        ts: firebase.firestore.FieldValue.serverTimestamp()
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const lv = Number(new FormData(form).get('lv'));
+    await db.collection('votes').add({
+      lv,
+      ts: firebase.firestore.FieldValue.serverTimestamp()
     });
     alert('ありがとうございました！');
     form.reset();
-    });
+  });
 
   /* --- リアルタイム集計 --- */
-    const indicator = document.getElementById('indicator');
-    const LABEL = ['空いてます','ほどほど','混んでます'];
-    const CLASS = ['lv0','lv1','lv2'];
+  const indicator = document.getElementById('indicator');
+  const LABEL = ['空いてます','ほどほど','混んでます'];
+  const CLASS = ['lv0','lv1','lv2'];
 
-    db.collection('votes')
-        .orderBy('ts','desc')
-        .limit(200)                    // 過去 200 票だけ監視（十分なら調整）
-        .onSnapshot(ss => {
-        const tenMinAgo = Date.now() - 10*60*1000;
-        const recent = ss.docs
-            .map(d => d.data())
-            .filter(d => d.ts && d.ts.toDate().getTime() > tenMinAgo);
+  db.collection('votes')
+    .orderBy('ts','desc')
+    .limit(200)  // 過去200票を監視
+    .onSnapshot(ss => {
+      const tenMinAgo = Date.now() - 10*60*1000;
+      const recent = ss.docs
+        .map(d => d.data())
+        .filter(d => d.ts && d.ts.toDate().getTime() > tenMinAgo);
 
-        const avg = recent.length
-            ? recent.reduce((s,v)=>s+v.lv,0)/recent.length
-            : 0;
+      const avg = recent.length
+        ? recent.reduce((s,v)=>s+v.lv,0)/recent.length
+        : 0;
 
-        const lv = Math.round(avg);
-        indicator.textContent = LABEL[lv];
-        indicator.className = CLASS[lv];
-        });
+      const lv = Math.round(avg);
+      indicator.textContent = LABEL[lv];
+      indicator.className = CLASS[lv];
+    });
 </script>
 </body>
 </html>
