@@ -24,7 +24,7 @@ async function loadMenus() {
             : '<span class="status soldout">×</span>'}
         <div id="buyForm-${menu.id}" style="display: none; margin-top: 10px;">
           ${menu.stock > 0
-            ? '<button onclick="alert(\\'購入しました\\')" class="buy-button">購入する</button>'
+            ? '<button onclick="alert(\'購入しました\')" class="buy-button">購入する</button>'
             : '<button type="button" disabled class="buy-button soldout-btn">売り切れ</button>'}
         </div>
       `;
@@ -32,6 +32,7 @@ async function loadMenus() {
       container.appendChild(div);
     });
   } catch (error) {
+    console.error("メニューの読み込み中にエラーが発生しました:", error); // エラーの詳細をコンソールに出力
     container.innerHTML = '<p>読み込みエラーが発生しました。</p>';
   }
 }

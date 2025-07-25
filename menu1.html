@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Weekly Menu</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="public/style.css">
 </head>
 <body>
 <div class="header-container">
-  <img src="/manpuku.png" alt="Home" class="header-logo" onclick="location.href='/'">
+  <img src="public/manpuku.png" alt="Home" class="header-logo" onclick="location.href='index.html'">
   <div class="header-title">Weekly Menu</div>
 </div>
 
@@ -34,7 +34,8 @@ const days = ['月', '火', '水', '木', '金'];
 
 async function loadWeeklyMenu() {
   try {
-    const res = await fetch('/api/menu');
+    // APIの代わりに静的JSONを取得
+    const res = await fetch('public/menu-weekly.json');
     const menus = await res.json();
 
     const menuByDay = { '月': {}, '火': {}, '水': {}, '木': {}, '金': {} };
