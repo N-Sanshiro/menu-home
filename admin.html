@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>メニュー入力</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>メニュー入力画面</h1>
+    <form action="/add" method="POST">
+      <label for="name">料理名：</label>
+      <input type="text" name="name" required>
+
+      <label for="kcal">カロリー（kcal）：</label>
+      <input type="number" name="kcal" step="0.1" required>
+
+      <label for="protein">たんぱく質（g）：</label>
+      <input type="number" name="protein" step="0.1" required>
+
+      <label for="fat">脂質（g）：</label>
+      <input type="number" name="fat" step="0.1" required>
+
+      <label for="salt">食塩相当量（g）：</label>
+      <input type="number" name="salt" step="0.1" required>
+
+      <label for="day">曜日：</label>
+      <select name="day" required>
+        <option value="月">月</option>
+        <option value="火">火</option>
+        <option value="水">水</option>
+        <option value="木">木</option>
+        <option value="金">金</option>
+      </select>
+
+      <label for="type">メニュータイプ：</label>
+      <select name="type" required>
+        <option value="A">日替わりランチ</option>
+        <option value="B">週替わりランチ</option>
+      </select>
+
+      <button type="submit">一週間のメニュー登録</button>
+    </form>
+  </div>
+
+  <h1 style="text-align: center;">券売機メニュー</h1>
+  <form action="/set" method="POST" style="margin-bottom: 20px;">
+    <button type="submit" style="padding: 10px 20px; font-size: 16px;">券売機データを追加</button>
+  </form>
+</body>
+</html>

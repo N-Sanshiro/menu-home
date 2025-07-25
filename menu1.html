@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Menu</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="header-container">
+  <img src="/manpuku.png" alt="Home" class="header-logo" onclick="location.href='/'">
+  <div class="header-title">Weekly Menu</div>
+</div>
+
+<div class="container">
+  <div class="table-wrapper">
+    <table class="menu-table">
+      <thead>
+        <tr>
+          <th>曜日</th>
+          <th>日替わりランチ<br>￥480</th>
+          <th>週替わりランチ<br>￥430</th>
+        </tr>
+      </thead>
+      <tbody id="menu-body">
+        <!-- JSで曜日ごとに行を追加 -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const days = ['月', '火', '水', '木', '金'];
+
+async function loadWeeklyMenu() {
+  try {
+    const res = await fetch('/api/menu');
+    const menus = await res.json();
+
+    const menuByDay = { '月': {}, '火': {}, '水': {}, '木': {}, '金': {} };
+
+    menus.forEach(item => {
+      if (!menuByDay[item.day]) return;
+      menuByDay[item.day][item.type] = item;
+    });
+
+    const tbody = document.getElementById('menu-body');
+
+    days.forEach(day => {
+      const tr = document.createElement('tr');
+
+      // 曜日
+      const dayTd = document.createElement('td');
+      dayTd.textContent = day;
+      tr.appendChild(dayTd);
+
+      // メニューA
+      const aTd = document.createElement('td');
+      const a = menuByDay[day].A;
+      aTd.innerHTML = a
+        ? `<div><strong>${a.name}</strong></div>
+           <div>カロリー: ${a.kcal} kcal<br>
+           タンパク質: ${a.protein} g<br>
+           脂質: ${a.fat} g<br>
+           食塩相当量: ${a.salt} g</div>`
+        : `<div>登録なし</div>`;
+      tr.appendChild(aTd);
+
+      // メニューB
+      const bTd = document.createElement('td');
+      const b = menuByDay[day].B;
+      bTd.innerHTML = b
+        ? `<div><strong>${b.name}</strong></div>
+           <div>カロリー: ${b.kcal} kcal<br>
+           タンパク質: ${b.protein} g<br>
+           脂質: ${b.fat} g<br>
+           食塩相当量: ${b.salt} g</div>`
+        : `<div>登録なし</div>`;
+      tr.appendChild(bTd);
+
+      tbody.appendChild(tr);
+    });
+  } catch (error) {
+    console.error('メニュー取得に失敗しました:', error);
+  }
+}
+
+loadWeeklyMenu();
+</script>
+</body>
+</html>
