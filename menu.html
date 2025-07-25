@@ -4,10 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>券売機メニュー</title>
+  <!-- スタイルシートのパスを修正 -->
   <link rel="stylesheet" href="public/style_vender.css">
 </head>
 <body>
   <div class="header-container">
+    <!-- ホームボタンのリンクを修正 -->
     <img src="public/manpuku.png" alt="Home" class="header-logo" onclick="location.href='index.html'">
     <div class="header-title">販売メニュー</div>
   </div>
@@ -18,54 +20,7 @@
     </div>
   </div>
 
-  <script>
-    async function loadMenus() {
-      const container = document.getElementById('menu-container');
-      try {
-        // APIの代わりにmenu.jsonを取得
-        const res = await fetch('public/menu.json');
-        const menus = await res.json();
-
-        if (!Array.isArray(menus) || menus.length === 0) {
-          container.innerHTML = '<p>メニューが存在しません。</p>';
-          return;
-        }
-
-        container.innerHTML = '';
-        menus.forEach(menu => {
-          const div = document.createElement('div');
-          div.className = 'menu-button';
-          div.onclick = () => toggleBuyButton(menu.id);
-
-          div.innerHTML = `
-            <strong>${menu.name}</strong>
-            ${menu.stock >= 6
-              ? '<span class="status available">〇</span>'
-              : menu.stock >= 1
-                ? '<span class="status few">△</span>'
-                : '<span class="status soldout">×</span>'}
-            <div id="buyForm-${menu.id}" style="display: none; margin-top: 10px;">
-              ${menu.stock > 0
-                ? '<button onclick="alert(\\'購入しました\\')" class="buy-button">購入する</button>'
-                : '<button type="button" disabled class="buy-button soldout-btn">売り切れ</button>'}
-            </div>
-          `;
-
-          container.appendChild(div);
-        });
-      } catch (error) {
-        container.innerHTML = '<p>読み込みエラーが発生しました。</p>';
-      }
-    }
-
-    function toggleBuyButton(id) {
-      const all = document.querySelectorAll('[id^="buyForm-"]');
-      all.forEach(f => f.style.display = 'none');
-      const form = document.getElementById('buyForm-' + id);
-      form.style.display = 'block';
-    }
-
-    loadMenus();
-  </script>
+  <!-- 外部スクリプト（public/script.js）を読み込み -->
+  <script src="public/script.js"></script>
 </body>
 </html>
