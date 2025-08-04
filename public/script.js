@@ -1,9 +1,15 @@
-// メニューを読み込んで表示する関数
 async function loadMenus() {
   const container = document.getElementById('menu-container');
   try {
-    const res = await fetch('public/menu.json?v=' + Date.now());
-    const menus = await res.json();
+    // localStorage に保存されていればそちらを使う
+    let menus = JSON.parse(localStorage.getItem('menus'));
+
+    if (!menus) {
+      const res = await fetch('public/menu.json?v=' + Date.now());
+      menus = await res.json();
+      // 初回読み込み時に localStorage に保存
+      localStorage.setItem('menus', JSON.stringify(menus));
+    }
 
     if (!Array.isArray(menus) || menus.length === 0) {
       container.innerHTML = '<p>メニューが存在しません。</p>';
@@ -41,11 +47,13 @@ async function loadMenus() {
   }
 }
 
-// 購入処理
 function buyMenu(menu) {
   if (menu.stock <= 0) return;
   menu.stock -= 1;
   alert('購入しました');
+
+  // 更新された在庫を保存
+  localStorage.setItem('menus', JSON.stringify(window._menus));
 
   const div = document.querySelector(`[data-id="${menu.id}"]`);
   if (div) {
@@ -67,13 +75,11 @@ function buyMenu(menu) {
   }
 }
 
-// IDからmenuを取得
 function buyMenuFromId(id) {
   const menu = window._menus.find(m => m.id === id);
   if (menu) buyMenu(menu);
 }
 
-// 購入ボタン表示切替
 function toggleBuyButton(id) {
   const all = document.querySelectorAll('[id^="buyForm-"]');
   all.forEach(f => f.style.display = 'none');
@@ -81,5 +87,5 @@ function toggleBuyButton(id) {
   if (form) form.style.display = 'block';
 }
 
-// 初期化
 document.addEventListener('DOMContentLoaded', loadMenus);
+
