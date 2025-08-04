@@ -1,6 +1,0 @@
-[
-  { "day": "月", "type": "A", "name": "唐揚げ定食", "kcal": 600, "protein": 20, "fat": 25, "salt": 2.5 },
-  { "day": "月", "type": "B", "name": "焼き魚定食", "kcal": 500, "protein": 22, "fat": 15, "salt": 2.0 },
-  { "day": "火", "type": "A", "name": "カツカレー", "kcal": 720, "protein": 18, "fat": 30, "salt": 3.0 },
-  { "day": "火", "type": "B", "name": "親子丼", "kcal": 580, "protein": 16, "fat": 20, "salt": 2.1 }
-]
