@@ -1,33 +1,4 @@
-// 変更：購入処理と表示更新を行う関数
-function buyMenu(menu) {
-  if (menu.stock <= 0) return;
-
-  menu.stock -= 1;
-  alert('購入しました');
-
-  // 対象メニューだけ更新
-  const div = document.querySelector(`[data-id="${menu.id}"]`);
-  if (div) {
-    div.querySelector('.status').outerHTML = 
-      menu.stock >= 6
-        ? '<span class="status available">〇</span>'
-        : menu.stock >= 1
-          ? '<span class="status few">△</span>'
-          : '<span class="status soldout">×</span>';
-
-    const buyForm = div.querySelector(`#buyForm-${menu.id}`);
-    buyForm.innerHTML = menu.stock > 0
-      ? '<button onclick="buyMenuFromId(' + menu.id + ')" class="buy-button">購入する</button>'
-      : '<button type="button" disabled class="buy-button soldout-btn">売り切れ</button>';
-  }
-}
-
-// idからmenuを取得してbuyMenuに渡す
-function buyMenuFromId(id) {
-  const menu = window._menus.find(m => m.id === id);
-  if (menu) buyMenu(menu);
-}
-
+// メニューを読み込んで表示する関数
 async function loadMenus() {
   const container = document.getElementById('menu-container');
   try {
@@ -39,9 +10,9 @@ async function loadMenus() {
       return;
     }
 
-    window._menus = menus; // グローバルに保存しておく
-
+    window._menus = menus;
     container.innerHTML = '';
+
     menus.forEach(menu => {
       const div = document.createElement('div');
       div.className = 'menu-button';
@@ -57,7 +28,7 @@ async function loadMenus() {
             : '<span class="status soldout">×</span>'}
         <div id="buyForm-${menu.id}" style="display: none; margin-top: 10px;">
           ${menu.stock > 0
-            ? '<button onclick="buyMenuFromId(' + menu.id + ')" class="buy-button">購入する</button>'
+            ? `<button onclick="buyMenuFromId(${menu.id}); event.stopPropagation();" class="buy-button">購入する</button>`
             : '<button type="button" disabled class="buy-button soldout-btn">売り切れ</button>'}
         </div>
       `;
@@ -69,4 +40,48 @@ async function loadMenus() {
     console.error('JSON読み込みエラー:', error);
   }
 }
+
+// 購入処理
+function buyMenu(menu) {
+  if (menu.stock <= 0) return;
+  menu.stock -= 1;
+  alert('購入しました');
+
+  const div = document.querySelector(`[data-id="${menu.id}"]`);
+  if (div) {
+    const statusSpan = div.querySelector('.status');
+    if (statusSpan) {
+      statusSpan.outerHTML = menu.stock >= 6
+        ? '<span class="status available">〇</span>'
+        : menu.stock >= 1
+          ? '<span class="status few">△</span>'
+          : '<span class="status soldout">×</span>';
+    }
+
+    const buyForm = div.querySelector(`#buyForm-${menu.id}`);
+    if (buyForm) {
+      buyForm.innerHTML = menu.stock > 0
+        ? `<button onclick="buyMenuFromId(${menu.id}); event.stopPropagation();" class="buy-button">購入する</button>`
+        : '<button type="button" disabled class="buy-button soldout-btn">売り切れ</button>';
+    }
+  }
+}
+
+// IDからmenuを取得
+function buyMenuFromId(id) {
+  const menu = window._menus.find(m => m.id === id);
+  if (menu) buyMenu(menu);
+}
+
+// 購入ボタン表示切替
+function toggleBuyButton(id) {
+  const all = document.querySelectorAll('[id^="buyForm-"]');
+  all.forEach(f => f.style.display = 'none');
+  const form = document.getElementById('buyForm-' + id);
+  if (form) form.style.display = 'block';
+}
+
+// 初期化
+document.addEventListener('DOMContentLoaded', loadMenus);
+
 
