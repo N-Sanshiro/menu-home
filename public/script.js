@@ -2,7 +2,7 @@
 async function loadMenus() {
   const container = document.getElementById('menu-container');
   try {
-    const res = await fetch('public/menu.json?v=' + Date.now());
+    const res = await fetch('menu.json?v=' + Date.now());
     const menus = await res.json();
 
     if (!Array.isArray(menus) || menus.length === 0) {
