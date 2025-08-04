@@ -1,7 +1,8 @@
 async function loadMenus() {
   const container = document.getElementById('menu-container');
   try {
-    const res = await fetch('public/menu.json');
+    // menu.jsonを読み込む
+    const res = await fetch('public/menu.json?v=' + Date.now()); // キャッシュ回避
     const menus = await res.json();
 
     if (!Array.isArray(menus) || menus.length === 0) {
@@ -32,8 +33,8 @@ async function loadMenus() {
       container.appendChild(div);
     });
   } catch (error) {
-    console.error("メニューの読み込み中にエラーが発生しました:", error); // エラーの詳細をコンソールに出力
     container.innerHTML = '<p>読み込みエラーが発生しました。</p>';
+    console.error('JSON読み込みエラー:', error);
   }
 }
 
